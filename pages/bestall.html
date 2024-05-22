@@ -45,6 +45,8 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
     <script>
         $(document).ready(function () {
             let totalAmount = 0;
@@ -102,30 +104,64 @@
 
             };
 
+            function generateAllergen(contents){
+                return contents ? contents.map(content => {
+                    if (content.startsWith("a:")){
+                        return `<span class="badge badge-warning">${content}</span>`;
+                    } else {
+                        return content;
+                    }
+                }).join(", ") : "";
+            }
+
             $("#selectFood").change(function () {
                 let selectedCategory = $(this).val();
                 $('#menuItems').empty();
 
                 var selectedMenu = menu[selectedCategory];
                 if (selectedMenu) {
-                    selectedMenu.forEach(item => {
+                    selectedMenu.forEach((item, index) => {
+                        var contentsList = item.contents ? item.contents.map(content => {
+                            if(content.startsWith("a:")) {
+                                return `<span class="allergen">${content}</span>`;
+                            } else {
+                                return content;
+                            }
+                        }).join(", ") : "";
                         var menuItem = `
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            ${item.name} - ${item.price} kr
-
-                            <button type="button" class="btn btn-success btn-sml ml-2 add-order"> Lägg till</button>
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                ${item.name} - ${item.price} kr
+                                <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
+                                    Innehåll
+                                </button>
+                                <button type="button" class="btn btn-success btn-sml ml-2 add-order" data-name="${item.name}" data-price="${item.price}">
+                                    Lägg till
+                                </button>
+                            </div>
+                            <div class="collapse" id="collapse${index}">
+                                <div class="card card-body">
+                                    ${contentsList}
+                                </div>
+                            </div>
                         </li>`;
+                        /*
                         $("#menuItems").append(menuItem)
+                        */
+                        let menuItemElement = $(menuItem);
+                        menuItemElement.find(".add-order").data("name", item.name).data("price", item.price);
+                        $("#menuItems").append(menuItemElement);
                     });
                 }
-
             });
 
 
             // Exempel på beställningar
             const orders = [
-                { name: "Rätt 1", price: 100, allergier: "Gluten" },
+                /*
+                { name: "Rätt 1", price: 100, allergies: "Gluten" },
                 { name: "Rätt 2", price: 150, allergier: "Nötter" }
+                */
             ];
 
             // Lägg till beställningar till listan
@@ -144,6 +180,14 @@
                 totalAmount += order.price;
                 $("#totalAmount").text(totalAmount + " kr");
             }
+
+            //Event för att lägga till beställningar
+            $("#menuItems").on("click", ".add-order", function() {
+                const item = $(this).data("name");
+                const price = $(this).data("price");
+                const contents = $(this).data("contents");
+                addOrder({ name : item, price : price, contents: contents});
+            });
 
             // Event för att ta bort beställningar
             $(document).on("click", ".remove-order", function () {
