@@ -1,0 +1,27 @@
+body {
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  margin-top: 20px;
+  position: relative;
+}
+
+#changeTable {
+  position: absolute;
+  top: 0;
+  right: 15px;
+}
+
+.category-selector {
+  margin-top: 30px;
+}
+
+.order-list {
+  margin-top: 30px;
+}
+
+.total {
+  margin-top: 30px;
+}

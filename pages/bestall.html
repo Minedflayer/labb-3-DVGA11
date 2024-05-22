@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurang Beställningsskärm</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/bestall.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header text-center">
+            <h1>Bord 1</h1>
+            <button type="button" class="btn btn-outline-secondary float-right" id="changeTable">Byt</button>
+        </div>
+        <div class="category-selector text-center mt-4">
+            <label for="selectFood">Välj Kategori:</label>
+            <select class="form-control" id="selectFood">
+                <option value="pizza_class_1">Pizzor klass 1</option>
+                <option value="pizza_class_2">Pizzor klass 2</option>
+                <option value="pizza_class_3">Pizzor klass 3</option>
+                <option value="sauces">Såser</option>
+                <option value="drinks">Dryck</option>
+            </select>
+        </div>
+        <div class="menu-items mt-4">
+            <h3>Meny</h3>
+            <ul class="list-group" id="menuItems">
+
+            </ul>
+        </div>
+
+        <div class="order-list mt-4">
+            <h3>Beställningar:</h3>
+            <ul class="list-group" id="orderList">
+                <!-- Beställningar läggs till dynamiskt -->
+            </ul>
+        </div>
+        <div class="total mt-4 text-center">
+            <h4>Totalsumma: <span id="totalAmount">0 kr</span></h4>
+            <button type="button" class="btn btn-primary" id="viewReceipt">Kvitto</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let totalAmount = 0;
+
+
+            const menu = {
+                "pizza_class_1": [
+                    { "name": "Margherita", "contents": ["Tomatsås", "Ost"], "price": 65 },
+                    { "name": "Vesuvio", "contents": ["Tomatsås", "Ost", "Skinka"], "price": 65 },
+                    { "name": "Altono", "contents": ["Tomatsås", "Ost", "Tonfisk"], "price": 65 }
+                ],
+                "pizza_class_2": [
+                    { "name": "Calzone", "contents": ["Tomatsås", "Ost", "Skinka"], "price": 80 },
+                    { "name": "Capricciosa", "contents": ["Tomatsås", "Ost", "Skinka", "Champinjoner"], "price": 70 },
+                    { "name": "Tomaso", "contents": ["Tomatsås", "Ost", "Skinka", "a:Räkor"], "price": 70 },
+                    { "name": "Hawaii", "contents": ["Tomatsås", "Ost", "Skinka", "Ananas"], "price": 70 },
+                    { "name": "Oriental", "contents": ["Tomatsås", "Ost", "Skinka", "Köttfärs"], "price": 70 },
+                    { "name": "Venezia", "contents": ["Tomatsås", "Ost", "Skinka", "Tonfisk"], "price": 70 },
+                    { "name": "Bolognese", "contents": ["Tomatsås", "Ost", "Köttfärs", "Lök"], "price": 70 },
+                    { "name": "Napoli", "contents": ["Tomatsås", "Ost", "Räkor", "Champinjoner"], "price": 70 }
+                ],
+                "pizza_class_3": [
+                    { "name": "Bravo", "contents": ["Tomatsås", "Ost", "Skinka", "Bacon", "Lök", "a:Ägg"], "price": 75 },
+                    { "name": "Princessa", "contents": ["Tomatsås", "Ost", "Skinka", "a:Räkor", "Champinjoner"], "price": 75 },
+                    { "name": "Kroppkärr", "contents": ["Tomatsås", "Ost", "Skinka", "Köttfärs", "Champinjoner"], "price": 75 },
+                    { "name": "Afrikano", "contents": ["Tomatsås", "Ost", "Skinka", "Ananas", "Curry", "Banan"], "price": 75 },
+                    { "name": "Önska", "contents": ["Tomatsås", "Ost", "Skinka", "a:Räkor", "Champinjoner"], "price": 85 },
+                    { "name": "Lambada", "contents": ["Tomatsås", "Ost", "Skinka", "Köttfärs", "a:Räkor"], "price": 75 },
+                    { "name": "Alsterdalen", "contents": ["Tomatsås", "Ost", "Skinka", "a:Crabfish", "a:Räkor"], "price": 75 },
+                    { "name": "Paradis", "contents": ["Tomatsås", "Ost", "Skinka", "a:Räkor", "Ananas"], "price": 75 },
+                    { "name": "Roma", "contents": ["Tomatsås", "Ost", "Skinka", "Kantareller", "Tomater (färska)"], "price": 75 },
+                    { "name": "Banjogatan", "contents": ["Tomatsås", "Ost", "Skinka", "Salami", "Paprika"], "price": 75 },
+                    { "name": "Rimini", "contents": ["Tomatsås", "Ost", "Köttfärs", "Gorgonzolaost", "Lök"], "price": 75 },
+                    { "name": "Opera", "contents": ["Tomatsås", "Ost", "Köttfärs", "Ananas", "Curry", "Banan"], "price": 75 },
+                    { "name": "Mesopotamia", "contents": ["Tomatsås", "Ost", "Salami", "Köttfärs", "a:Nötter"], "price": 75 }
+                ],
+                "sauces": [
+                    { "name": "Bearnaisesås 10 cl ", "price": 10 },
+                    { "name": "Kebabsås mild 10 cl ", "price": 10 },
+                    { "name": "Kebabsås stark 10 cl ", "price": 10 },
+                    { "name": "Kebabsås blandad 10 cl ", "price": 10 },
+                    { "name": "Tzatzikisås 10 cl ", "price": 10 },
+                    { "name": "Vitlökssås 10 cl ", "price": 10 }
+                ],
+                "drinks": [
+                    { "name": "Coca-Cola 33 cl ", "price": 15 },
+                    { "name": "Coca-Cola light 33 cl ", "price": 15 },
+                    { "name": "Fanta 33 cl ", "price": 15 },
+                    { "name": "Sprite 33 cl ", "price": 15 },
+                    { "name": "Mineralvatten 33 cl ", "price": 15 },
+                    { "name": "Lättöl 33 cl ", "price": 15 },
+                    { "name": "Coca-Cola 50 cl ", "price": 20 },
+                    { "name": "Fanta 50 cl ", "price": 20 }
+                ]
+
+            };
+
+            $("#selectFood").change(function () {
+                let selectedCategory = $(this).val();
+                $('#menuItems').empty();
+
+                var selectedMenu = menu[selectedCategory];
+                if (selectedMenu) {
+                    selectedMenu.forEach(item => {
+                        var menuItem = `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            ${item.name} - ${item.price} kr
+
+                            <button type="button" class="btn btn-success btn-sml ml-2 add-order"> Lägg till</button>
+                        </li>`;
+                        $("#menuItems").append(menuItem)
+                    });
+                }
+
+            });
+
+
+            // Exempel på beställningar
+            const orders = [
+                { name: "Rätt 1", price: 100, allergier: "Gluten" },
+                { name: "Rätt 2", price: 150, allergier: "Nötter" }
+            ];
+
+            // Lägg till beställningar till listan
+            orders.forEach(order => {
+                addOrder(order);
+            });
+
+            function addOrder(order) {
+                const orderItem = `
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                ${order.name} - ${order.price} kr
+                <span class="badge badge-warning">${order.allergies}</span>
+                <button type="button" class="btn btn-danger btn-sm ml-2 remove-order">X</button>
+            </li>`;
+                $("#orderList").append(orderItem);
+                totalAmount += order.price;
+                $("#totalAmount").text(totalAmount + " kr");
+            }
+
+            // Event för att ta bort beställningar
+            $(document).on("click", ".remove-order", function () {
+                const item = $(this).closest("li");
+                const price = parseInt(item.text().match(/\d+/)[0]);
+                totalAmount -= price;
+                $("#totalAmount").text(totalAmount + " kr");
+                item.remove();
+            });
+
+            // Event för att visa kvitto
+            $("#viewReceipt").click(function () {
+                alert("Visar kvitto med totalbelopp: " + totalAmount + " kr");
+            });
+        });
+
+    </script>
+</body>
+
+</html>
