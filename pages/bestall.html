@@ -41,7 +41,29 @@
         </div>
         <div class="total mt-4 text-center">
             <h4>Totalsumma: <span id="totalAmount">0 kr</span></h4>
-            <button type="button" class="btn btn-primary" id="viewReceipt">Kvitto</button>
+            <button type="button" class="btn btn-primary" id="viewReceipt" data-toggle="modal" data-target="#exampleModal">Kvitto</button>
+        </div>
+    </div>
+  
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Betala</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group" id="modalOrderList"></ul>
+                <h5 class="mt-3">Totalsumma: <span id="modalTotalAmount">0 kr</span></h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
+                <button type="button" class="btn btn-primary" id="paymentDone">Betalning klar</button>
+            </div>
+        </div>
         </div>
     </div>
 
@@ -107,16 +129,6 @@
 
             };
 
-            function generateAllergen(contents) {
-                return contents ? contents.map(content => {
-                    if (content.startsWith("a:")) {
-                        return `<span class="badge badge-warning">${content}</span>`;
-                    } else {
-                        return content;
-                    }
-                }).join(", ") : "";
-            }
-
             $("#selectFood").change(function () {
                 let selectedCategory = $(this).val();
                 $('#menuItems').empty();
@@ -180,15 +192,13 @@
                 const orderItem = `
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 ${order.name} - ${order.price} kr
-               
-                
                 <input type="text" class="form-control special-wishes">
-               
                 <button type="button" class="btn btn-danger btn-sm ml-2 remove-order">X</button>
             </li>`;
                 $("#orderList").append(orderItem);
                 totalAmount += order.price;
                 $("#totalAmount").text(totalAmount + " kr");
+                orders.push(order);                                 //kanske ta bort
             }
 
             //Event för att lägga till beställningar
@@ -212,11 +222,29 @@
 
             // Event för att visa kvitto
             $("#viewReceipt").click(function () {
-                alert("Visar kvitto med totalbelopp: " + totalAmount + " kr");
+                $('#modalOrderList').empty();
+
+                orders.forEach(order => {
+                    const orderItem = `<li class="list-group-item">${order.name} - ${order.price} kr</li>`;
+                    $('#modalOrderList').append(orderItem);
+                });
+
+                $('#modalTotalAmount').text(totalAmount + ' kr');
             });
+
+
+            //DENNA SKA RENSA LISTA PÅ BESTÄLLNINGAR NÄR BETALNING KLAR KLICKAS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            $("paymentDone").click(function () {
+                orders = [];
+                totalAmount = 0;
+
+                $("#orderList").empty();
+                $("totalAmount").text("0 kr");
+
+                $('#exampleModal').modal('hide');
+            })
         });
 
     </script>
 </body>
-
 </html>
