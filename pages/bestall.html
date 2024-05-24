@@ -89,7 +89,7 @@
                     <h5 class="mt-3">Totalsumma: <span id="modalTotalAmount">0 kr</span></h5>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Avbryt</button>
                     <button type="button" class="btn btn-primary" id="paymentDone">Betalning klar</button>
                 </div>
             </div>
@@ -185,10 +185,6 @@
                 });
             }
 
-
-
-
-
             $("#selectFood").change(function () {
                 let selectedCategory = $(this).val();
                 $('#menuItems').empty();
@@ -237,10 +233,6 @@
 
             // Exempel på beställningar
             const orders = [
-                /*
-                { name: "Rätt 1", price: 100, allergies: "Gluten" },
-                { name: "Rätt 2", price: 150, allergier: "Nötter" }
-                */
             ];
 
             // Lägg till beställningar till listan
@@ -258,15 +250,13 @@
                 $("#orderList").append(orderItem);
                 totalAmount += order.price;
                 $("#totalAmount").text(totalAmount + " kr");
-                orders.push(order);                                 //kanske ta bort
             }
 
             //Event för att lägga till beställningar
             $("#menuItems").on("click", ".add-order", function () {
                 const item = $(this).data("name");
                 const price = $(this).data("price");
-                const contents = $(this).data("contents");
-                addOrder({ name: item, price: price, contents: contents });
+                addOrder({ name: item, price: price});
             });
 
 
@@ -294,20 +284,15 @@
 
 
             //DENNA SKA RENSA LISTA PÅ BESTÄLLNINGAR NÄR BETALNING KLAR KLICKAS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            $("paymentDone").click(function () {
-                orders = [];
+            $("#paymentDone").click(function () {
                 totalAmount = 0;
-
                 $("#orderList").empty();
-                $("totalAmount").text("0 kr");
-
+                $("#totalAmount").text("0 kr");
                 $('#exampleModal').modal('hide');
-            })
+            });
             updateOrderList();
-
         });
 
     </script>
 </body>
-
 </html>
