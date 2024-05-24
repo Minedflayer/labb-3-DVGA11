@@ -16,6 +16,33 @@
             <h1>Bord 1</h1>
             <button type="button" class="btn btn-outline-secondary float-right" id="changeTable">Byt</button>
         </div>
+
+        <!--Välja Bord-->
+        <div class="modal fade" id="tableModal" tabindex="-1" aria-labelledby="tableModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="tableModalLabel">Välj Bord</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Text goes here</p>
+                        <select class="form-control" id="select-table">
+                            <option value="1">Bord 1</option>
+                            <option value="2">Bord 2</option>
+                            <option value="3">Bord 3</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="confirmTableChange">Bekräfta</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="category-selector text-center mt-4">
             <label for="selectFood">Välj Kategori:</label>
             <select class="form-control" id="selectFood">
@@ -41,29 +68,31 @@
         </div>
         <div class="total mt-4 text-center">
             <h4>Totalsumma: <span id="totalAmount">0 kr</span></h4>
-            <button type="button" class="btn btn-primary" id="viewReceipt" data-toggle="modal" data-target="#exampleModal">Kvitto</button>
+            <button type="button" class="btn btn-primary" id="viewReceipt" data-toggle="modal"
+                data-target="#exampleModal">Kvitto</button>
         </div>
     </div>
-  
+
     <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Betala</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Betala</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="list-group" id="modalOrderList"></ul>
+                    <h5 class="mt-3">Totalsumma: <span id="modalTotalAmount">0 kr</span></h5>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
+                    <button type="button" class="btn btn-primary" id="paymentDone">Betalning klar</button>
+                </div>
             </div>
-            <div class="modal-body">
-                <ul class="list-group" id="modalOrderList"></ul>
-                <h5 class="mt-3">Totalsumma: <span id="modalTotalAmount">0 kr</span></h5>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Stäng</button>
-                <button type="button" class="btn btn-primary" id="paymentDone">Betalning klar</button>
-            </div>
-        </div>
         </div>
     </div>
 
@@ -129,6 +158,37 @@
 
             };
 
+
+            let tableSelected = '1';
+            let tableList = {
+                1: [],
+                2: [],
+                3: []
+            };
+
+            $("#changeTable").click(function () {
+                $("#tableModal").modal('show');
+            });
+
+            $("#confirmTableChange").click(function () {
+                tableSelected = $("#select-table").val();
+                $('#tableModal').modal('hide');
+            })
+
+            // Uppdatera efter att ha bytt bord
+            function updateOrderList() {
+                $('#orderList').empty(); // Rensa orderlistan
+                totalAmount = 0;
+
+                orders[tableSelected].forEach(order => {
+                    addOrder(order);
+                });
+            }
+
+
+
+
+
             $("#selectFood").change(function () {
                 let selectedCategory = $(this).val();
                 $('#menuItems').empty();
@@ -191,7 +251,7 @@
             function addOrder(order) {
                 const orderItem = `
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                ${order.name} - ${order.price} kr
+                ${order.name} - ${order.price} kr       
                 <input type="text" class="form-control special-wishes">
                 <button type="button" class="btn btn-danger btn-sm ml-2 remove-order">X</button>
             </li>`;
@@ -243,8 +303,11 @@
 
                 $('#exampleModal').modal('hide');
             })
+            updateOrderList();
+
         });
 
     </script>
 </body>
+
 </html>
