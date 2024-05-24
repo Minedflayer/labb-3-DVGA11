@@ -25,3 +25,11 @@ body {
 .total {
   margin-top: 30px;
 }
+
+.allergen {
+  background-color: red;
+  color: white;
+  padding: 2px 4px;
+  border-radius: 4px;
+  display: inline-block !important;
+}

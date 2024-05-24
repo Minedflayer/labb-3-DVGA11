@@ -104,16 +104,6 @@
 
             };
 
-            function generateAllergen(contents){
-                return contents ? contents.map(content => {
-                    if (content.startsWith("a:")){
-                        return `<span class="badge badge-warning">${content}</span>`;
-                    } else {
-                        return content;
-                    }
-                }).join(", ") : "";
-            }
-
             $("#selectFood").change(function () {
                 let selectedCategory = $(this).val();
                 $('#menuItems').empty();
@@ -123,7 +113,8 @@
                     selectedMenu.forEach((item, index) => {
                         var contentsList = item.contents ? item.contents.map(content => {
                             if(content.startsWith("a:")) {
-                                return `<span class="allergen">${content}</span>`;
+                                let contentWithoutA = content.replace("a:", "");
+                                return `<span class="allergen">${contentWithoutA}</span>`;
                             } else {
                                 return content;
                             }
@@ -155,7 +146,6 @@
                 }
             });
 
-
             // Exempel på beställningar
             const orders = [
                 /*
@@ -173,7 +163,6 @@
                 const orderItem = `
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 ${order.name} - ${order.price} kr
-                <span class="badge badge-warning">${order.allergies}</span>
                 <button type="button" class="btn btn-danger btn-sm ml-2 remove-order">X</button>
             </li>`;
                 $("#orderList").append(orderItem);
