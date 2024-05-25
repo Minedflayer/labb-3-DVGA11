@@ -106,7 +106,7 @@
             let totalAmount = 0;
 
 
-            const menu = {
+            var menu = {
                 "pizza_class_1": [
                     { "name": "Margherita", "contents": ["Tomatsås", "Ost"], "price": 65 },
                     { "name": "Vesuvio", "contents": ["Tomatsås", "Ost", "Skinka"], "price": 65 },
@@ -160,29 +160,62 @@
 
 
             let tableSelected = '1';
-            let tableList = {
+            var tableList = {
                 1: [],
                 2: [],
                 3: []
             };
 
+            var totals = {
+                1: 0,
+                2: 0,
+                3: 0
+            };
+
+            // Öppnar Modal-fönstret för att ändra bord
             $("#changeTable").click(function () {
                 $("#tableModal").modal('show');
             });
 
+            // Bekrftälse av ändring
             $("#confirmTableChange").click(function () {
+                totalAmount = 0;
                 tableSelected = $("#select-table").val();
                 $('#tableModal').modal('hide');
-            })
+                updateOrderList();
+            });
 
-            // Uppdatera efter att ha bytt bord
+
+            // Uppdatera orderlista utefter det valda bordet
             function updateOrderList() {
                 $('#orderList').empty(); // Rensa orderlistan
-                totalAmount = 0;
+                totalAmount = 0; // Återställer summan
+
 
                 orders[tableSelected].forEach(order => {
                     addOrder(order);
                 });
+
+
+                /*
+            tableList[tableSelected].forEach(order => {
+                const orderItem = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${order.name} - ${order.price} kr
+                    <input type="text" class="form-control special-wishes" value="${order.specialWishes || ''}">
+                    <button type="button" class="btn btn-danger btn-sm ml-2 remove-order">X</button>
+                </li>`;
+                $("#orderList").append(orderItem);
+                totalAmount += order.price;
+            });
+            */
+
+                // totalAmount tilldelas summan för det valda bordet
+                totalAmount = totals[tableSelected];
+                totals[tableSelected]
+
+                $("#totalAmount").text(totalAmount + " kr");
+                $("#tableTitle").text("Bord " + tableSelected);
             }
 
             $("#selectFood").change(function () {
@@ -256,7 +289,7 @@
             $("#menuItems").on("click", ".add-order", function () {
                 const item = $(this).data("name");
                 const price = $(this).data("price");
-                addOrder({ name: item, price: price});
+                addOrder({ name: item, price: price });
             });
 
 
@@ -290,9 +323,13 @@
                 $("#totalAmount").text("0 kr");
                 $('#exampleModal').modal('hide');
             });
+
+
             updateOrderList();
         });
 
+
     </script>
 </body>
+
 </html>
