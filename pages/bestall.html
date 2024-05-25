@@ -12,6 +12,11 @@
 <body>
     <!--Gruppmedlemmar: Victor Tell, Felix Maussier och Pontus Nilsson-->
     <div class="container">
+        <div class="header">
+            <a href="/index.html">
+                <h1>Restaurangens Namn</h1>
+            </a>
+        </div>
         <div class="header text-center">
             <h1 id="tableTitle">Bord 1</h1>
             <button type="button" class="btn btn-outline-secondary float-right" id="changeTable">Byt</button>
@@ -179,7 +184,7 @@
                 $("#tableModal").modal('show');
             });
 
-            // Bekrftälse av ändring
+            // Bekräftälse av ändring
             $("#confirmTableChange").click(function () {
                 totalAmount = 0;
                 tableSelected = $("#select-table").val();
@@ -286,9 +291,10 @@
 
 
             // Event för att ta bort beställningar
+            // Källa för Regular expression: https://www.w3schools.com/js/js_regexp.asp
             $(document).on("click", ".remove-order", function () {
                 const item = $(this).closest("li");
-                const price = parseInt(item.text().match(/\d+/)[0]);
+                const price = parseInt(item.text().replace(/[^0-9]/g, ''));
                 totalAmount -= price;
                 $("#totalAmount").text(totalAmount + " kr");
                 item.remove();
