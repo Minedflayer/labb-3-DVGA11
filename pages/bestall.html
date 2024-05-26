@@ -165,14 +165,14 @@
 
             let tableSelected = '1';
 
-            // Tanken var att man ska kunna spara måltiderna som respektive bord har beställt
+            //  Sparar måltiderna som respektive bord har beställt
             var tableList = {
                 1: [],
                 2: [],
                 3: []
             };
 
-            // Array som ska lagra summan för respektive bord
+            // Array som ska lagra summan för respektive bords order
             var totals = {
                 1: 0,
                 2: 0,
@@ -198,21 +198,25 @@
             // Uppdatera orderlista utefter det valda bordet
             function updateOrderList() {
                 $('#orderList').empty(); // Rensa orderlistan
-                totalAmount = 0; // Återställer summan
+                // totalAmount = 0; // Återställer summan
 
+                let tableOrders = tableList[tableSelected]; // Tildelas det aktiva bordet
+                totalAmount = totals[tableSelected] // pris för det aktiva bordets besttällning
 
-                orders[tableSelected].forEach(order => {
-                    addOrder(order);
+                tableOrders.forEach(order => {
+                    let orderItem = `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${order.name} - ${order.price} kr
+                    <input type="text" class="form-control special-wishes">
+                    <button type="button" class="btn btn-danger btn-sm ml-2 remove-order">X</button>
+                </li>`;
+                    $("#orderList").append(orderItem); // lägger till en orders innehåll till <li> som har orderList som id
                 });
-
-
-                // totalAmount tilldelas summan för det valda bordet
-                totalAmount = totals[tableSelected];
-                totals[tableSelected]
 
                 $("#totalAmount").text(totalAmount + " kr");
                 $("#tableTitle").text("Bord " + tableSelected);
             }
+
 
             $("#selectFood").change(function () {
                 let selectedCategory = $(this).val();
@@ -257,14 +261,6 @@
                 }
             });
 
-            // Exempel på beställningar
-            const orders = [
-            ];
-
-            // Lägg till beställningar till listan
-            orders.forEach(order => {
-                addOrder(order);
-            });
 
             function addOrder(order) {
                 const orderItem = `
@@ -276,6 +272,9 @@
                 $("#orderList").append(orderItem);
                 totalAmount += order.price;
                 $("#totalAmount").text(totalAmount + " kr");
+
+                tableList[tableSelected].push(order);
+                totals[tableSelected] = totalAmount;
             }
 
             //Event för att lägga till beställningar
@@ -291,7 +290,8 @@
             // Källa för Regular expression: https://www.w3schools.com/js/js_regexp.asp
             $(document).on("click", ".remove-order", function () {
                 const item = $(this).closest("li");
-                const price = parseInt(item.text().replace(/[^0-9]/g, ''));
+                // const price = parseInt(item.text().replace(/[^0-9]/g, ''));
+                const price = parseInt(item.text().match(/\d+/)[0]);
                 totalAmount -= price;
                 $("#totalAmount").text(totalAmount + " kr");
                 item.remove();
@@ -300,19 +300,23 @@
             // Event för att visa kvitto
             $("#viewReceipt").click(function () {
                 $('#modalOrderList').empty();
+                let tableOrders = tableList[tableSelected];
 
-                orders.forEach(order => {
+                tableOrders.forEach(order => {
                     const orderItem = `<li class="list-group-item">${order.name} - ${order.price} kr</li>`;
                     $('#modalOrderList').append(orderItem);
                 });
 
-                $('#modalTotalAmount').text(totalAmount + ' kr');
+                //$('#modalTotalAmount').text(totalAmount + ' kr');
+                $('#modalTotalAmount').text(totals[tableSelected] + ' kr');
             });
 
 
             //DENNA SKA RENSA LISTA PÅ BESTÄLLNINGAR NÄR BETALNING KLAR KLICKAS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             $("#paymentDone").click(function () {
                 totalAmount = 0;
+                tableList[tableSelected] = []; // tömmer arrayen för det valda bordet
+                totals[tableSelected] = 0; // Nollställer priset för det valda bordet
                 $("#orderList").empty();
                 $("#totalAmount").text("0 kr");
                 $('#exampleModal').modal('hide');
