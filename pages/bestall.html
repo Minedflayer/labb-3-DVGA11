@@ -234,12 +234,20 @@
                                 return content;
                             }
                         }).join(", ") : "";
-
+                        
+                        /*25 JUNI*/
+                        var badges = item.contents ? item.contents.filter(content => content.startsWith("a:")).map(content => {
+                            let contentWithoutA = content.replace("a:", "");
+                            return `<span class="badge badge-danger">${contentWithoutA}</span>`;
+                        }).join(" ") : "";
 
                         var menuItem = `
                         <li class="list-group-item">
                             <div class="d-flex justify-content-between align-items-center">
-                                ${item.name} - ${item.price} kr
+                                <div>
+                                    ${item.name} - ${item.price} kr
+                                    ${badges}
+                                </div>
                                 <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#collapse${index}" aria-expanded="false" aria-controls="collapse${index}">
                                     Innehåll
                                 </button>
